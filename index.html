@@ -11,7 +11,7 @@
   li.active { background:#10B981; }
 
   /* popup */
-  #popup {
+  .popup {
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
@@ -21,22 +21,38 @@
     align-items:center;
     z-index:999;
   }
-  #popupBox {
+  .box {
     background:#222;
-    padding:30px;
+    padding:25px;
     border-radius:10px;
     text-align:center;
+    max-width:350px;
   }
 </style>
 </head>
 <body>
 
-<!-- 🔥 Popup -->
-<div id="popup">
-  <div id="popupBox">
+<!-- 🔥 Popup welcome -->
+<div id="welcomePopup" class="popup">
+  <div class="box">
     <h2>🎵 MP3 Player</h2>
     <p>create by <b>Ryu XP</b></p>
-    <button onclick="closePopup()">เริ่มใช้งาน</button>
+    <button onclick="closeWelcome()">เริ่มใช้งาน</button>
+  </div>
+</div>
+
+<!-- 🔥 Popup วิธีใช้ -->
+<div id="helpPopup" class="popup" style="display:none;">
+  <div class="box">
+    <h3>📖 วิธีใช้งาน</h3>
+    <p>
+      1. กดปุ่ม 📁 เลือกโฟลเดอร์<br>
+      2. เลือกโฟลเดอร์ที่มีไฟล์ .mp3<br>
+      3. คลิกเพลงเพื่อเล่น<br>
+      4. เพลงจะเล่นต่ออัตโนมัติ<br>
+      5. ถ้ามีเพลงใหม่ กด 🔄 รีเฟรช
+    </p>
+    <button onclick="closeHelp()">ปิด</button>
   </div>
 </div>
 
@@ -44,9 +60,10 @@
 
 <button onclick="pickFolder()">📁 เลือกโฟลเดอร์</button>
 <button onclick="refreshFolder()">🔄 รีเฟรชเพลง</button>
+<button onclick="openHelp()">❓ วิธีใช้</button>
 
-<!-- 🔥 ปุ่มแจ้งปัญหา -->
 <br>
+
 <a href="https://ryuxp.vercel.app" target="_blank">
   <button>⚠️ แจ้งปัญหา</button>
 </a>
@@ -65,9 +82,17 @@ let dirHandle = null;
 
 const player = document.getElementById("player");
 
-// 🔒 ปิด popup
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
+// 🔒 popup
+function closeWelcome() {
+  document.getElementById("welcomePopup").style.display = "none";
+}
+
+function openHelp() {
+  document.getElementById("helpPopup").style.display = "flex";
+}
+
+function closeHelp() {
+  document.getElementById("helpPopup").style.display = "none";
 }
 
 // 📁 เลือกโฟลเดอร์
@@ -130,7 +155,7 @@ async function playIndex(index) {
   });
 }
 
-// ⏭️ เล่นถัดไปอัตโนมัติ
+// ⏭️ เล่นต่ออัตโนมัติ
 player.addEventListener("ended", () => {
   currentIndex++;
   if (currentIndex >= files.length) currentIndex = 0;

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>MP3 Folder Player</title>
+<style>
+  body { font-family: sans-serif; background:#111; color:#fff; text-align:center; }
+  button { padding:10px 20px; margin:10px; font-size:16px; }
+  ul { list-style:none; padding:0; max-width:400px; margin:auto; }
+  li { padding:8px; border-bottom:1px solid #333; cursor:pointer; }
+  li.active { background:#10B981; }
+
+  /* popup */
+  #popup {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.8);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+  }
+  #popupBox {
+    background:#222;
+    padding:30px;
+    border-radius:10px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<!-- 🔥 Popup -->
+<div id="popup">
+  <div id="popupBox">
+    <h2>🎵 MP3 Player</h2>
+    <p>create by <b>Ryu XP</b></p>
+    <button onclick="closePopup()">เริ่มใช้งาน</button>
+  </div>
+</div>
+
+<h2>🎵 MP3 Folder Player</h2>
+
+<button onclick="pickFolder()">📁 เลือกโฟลเดอร์</button>
+<button onclick="refreshFolder()">🔄 รีเฟรชเพลง</button>
+
+<!-- 🔥 ปุ่มแจ้งปัญหา -->
+<br>
+<a href="https://ryuxp.vercel.app" target="_blank">
+  <button>⚠️ แจ้งปัญหา</button>
+</a>
+
+<p id="folderName">ยังไม่ได้เลือกโฟลเดอร์</p>
+
+<audio id="player" controls></audio>
+<h3 id="nowPlaying">ยังไม่ได้เล่น</h3>
+
+<ul id="playlist"></ul>
+
+<script>
+let files = [];
+let currentIndex = 0;
+let dirHandle = null;
+
+const player = document.getElementById("player");
+
+// 🔒 ปิด popup
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+
+// 📁 เลือกโฟลเดอร์
+async function pickFolder() {
+  dirHandle = await window.showDirectoryPicker();
+  loadFiles();
+}
+
+// 🔄 รีเฟรช
+async function refreshFolder() {
+  if (!dirHandle) {
+    alert("กรุณาเลือกโฟลเดอร์ก่อน");
+    return;
+  }
+  loadFiles();
+}
+
+// 📥 โหลดไฟล์
+async function loadFiles() {
+  files = [];
+
+  for await (const entry of dirHandle.values()) {
+    if (entry.kind === "file" && entry.name.endsWith(".mp3")) {
+      files.push(entry);
+    }
+  }
+
+  files.sort((a,b)=>a.name.localeCompare(b.name));
+
+  document.getElementById("folderName").innerText = "📁 " + dirHandle.name;
+  renderList();
+}
+
+// 📃 แสดงรายการ
+function renderList() {
+  const ul = document.getElementById("playlist");
+  ul.innerHTML = "";
+
+  files.forEach((file, index) => {
+    const li = document.createElement("li");
+    li.textContent = file.name;
+    li.onclick = () => playIndex(index);
+    ul.appendChild(li);
+  });
+}
+
+// ▶️ เล่นเพลง
+async function playIndex(index) {
+  currentIndex = index;
+  const file = await files[index].getFile();
+  const url = URL.createObjectURL(file);
+
+  player.src = url;
+  player.play();
+
+  document.getElementById("nowPlaying").innerText = "🎶 " + file.name;
+
+  document.querySelectorAll("li").forEach((li,i)=>{
+    li.classList.toggle("active", i===index);
+  });
+}
+
+// ⏭️ เล่นถัดไปอัตโนมัติ
+player.addEventListener("ended", () => {
+  currentIndex++;
+  if (currentIndex >= files.length) currentIndex = 0;
+  playIndex(currentIndex);
+});
+</script>
+
+</body>
+</html>

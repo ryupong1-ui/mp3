@@ -1,167 +1,121 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>MP3 Folder Player</title>
-<style>
-  body { font-family: sans-serif; background:#111; color:#fff; text-align:center; }
-  button { padding:10px 20px; margin:10px; font-size:16px; }
-  ul { list-style:none; padding:0; max-width:400px; margin:auto; }
-  li { padding:8px; border-bottom:1px solid #333; cursor:pointer; }
-  li.active { background:#10B981; }
+  <meta charset="UTF-8">
+  <title>กำลังปรับปรุง</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  /* popup */
-  .popup {
-    position:fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background:rgba(0,0,0,0.8);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:999;
-  }
-  .box {
-    background:#222;
-    padding:25px;
-    border-radius:10px;
-    text-align:center;
-    max-width:350px;
-  }
-</style>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(0,0,0,0.4);
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 500px;
+      animation: fadeIn 1.5s ease;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      animation: bounce 2s infinite;
+    }
+
+    .loader {
+      margin: 20px auto;
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255,255,255,0.3);
+      border-top: 6px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .updates {
+      text-align: left;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+    }
+
+    .updates li {
+      margin: 5px 0;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0);}
+      50% { transform: translateY(-10px);}
+    }
+
+    .footer {
+      margin-top: 15px;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+  </style>
 </head>
 <body>
 
-<!-- 🔥 Popup welcome -->
-<div id="welcomePopup" class="popup">
-  <div class="box">
-    <h2>🎵 MP3 Player</h2>
-    <p>create by <b>Ryu XP</b></p>
-    <button onclick="closeWelcome()">เริ่มใช้งาน</button>
+  <div class="container">
+    <h1>🚧 กำลังปรับปรุง</h1>
+
+    <div class="loader"></div>
+
+    <p>เว็บไซต์กำลังอัปเดต<br>ขออภัยในความไม่สะดวก</p>
+
+    <!-- 🔔 รายการอัปเดต -->
+    <div class="updates">
+      <strong>📢 สิ่งที่กำลังปรับปรุง:</strong>
+      <ul>
+        <li>✨ ปรับปรุงหน้าตาเว็บไซต์ใหม่</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      จะกลับมาเร็ว ๆ นี้ 🙏
+    </div>
   </div>
-</div>
 
-<!-- 🔥 Popup วิธีใช้ -->
-<div id="helpPopup" class="popup" style="display:none;">
-  <div class="box">
-    <h3>📖 วิธีใช้งาน</h3>
-    <p>
-      1. กดปุ่ม 📁 เลือกโฟลเดอร์<br>
-      2. เลือกโฟลเดอร์ที่มีไฟล์ .mp3<br>
-      3. คลิกเพลงเพื่อเล่น<br>
-      4. เพลงจะเล่นต่ออัตโนมัติ<br>
-      5. ถ้ามีเพลงใหม่ กด 🔄 รีเฟรช
-    </p>
-    <button onclick="closeHelp()">ปิด</button>
-  </div>
-</div>
+  <!-- 🔊 เสียง -->
+  <audio id="bgSound" autoplay>
+    <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
+  </audio>
 
-<h2>🎵 MP3 Folder Player</h2>
+  <script>
+    // เล่นเสียงเมื่อโหลดหน้า (บาง browser ต้อง interaction ก่อน)
+    window.addEventListener("load", () => {
+      const sound = document.getElementById("bgSound");
+      sound.volume = 0.3;
 
-<button onclick="pickFolder()">📁 เลือกโฟลเดอร์</button>
-<button onclick="refreshFolder()">🔄 รีเฟรชเพลง</button>
-<button onclick="openHelp()">❓ วิธีใช้</button>
-
-<br>
-
-<a href="https://ryuxp.vercel.app" target="_blank">
-  <button>⚠️ แจ้งปัญหา</button>
-</a>
-
-<p id="folderName">ยังไม่ได้เลือกโฟลเดอร์</p>
-
-<audio id="player" controls></audio>
-<h3 id="nowPlaying">ยังไม่ได้เล่น</h3>
-
-<ul id="playlist"></ul>
-
-<script>
-let files = [];
-let currentIndex = 0;
-let dirHandle = null;
-
-const player = document.getElementById("player");
-
-// 🔒 popup
-function closeWelcome() {
-  document.getElementById("welcomePopup").style.display = "none";
-}
-
-function openHelp() {
-  document.getElementById("helpPopup").style.display = "flex";
-}
-
-function closeHelp() {
-  document.getElementById("helpPopup").style.display = "none";
-}
-
-// 📁 เลือกโฟลเดอร์
-async function pickFolder() {
-  dirHandle = await window.showDirectoryPicker();
-  loadFiles();
-}
-
-// 🔄 รีเฟรช
-async function refreshFolder() {
-  if (!dirHandle) {
-    alert("กรุณาเลือกโฟลเดอร์ก่อน");
-    return;
-  }
-  loadFiles();
-}
-
-// 📥 โหลดไฟล์
-async function loadFiles() {
-  files = [];
-
-  for await (const entry of dirHandle.values()) {
-    if (entry.kind === "file" && entry.name.endsWith(".mp3")) {
-      files.push(entry);
-    }
-  }
-
-  files.sort((a,b)=>a.name.localeCompare(b.name));
-
-  document.getElementById("folderName").innerText = "📁 " + dirHandle.name;
-  renderList();
-}
-
-// 📃 แสดงรายการ
-function renderList() {
-  const ul = document.getElementById("playlist");
-  ul.innerHTML = "";
-
-  files.forEach((file, index) => {
-    const li = document.createElement("li");
-    li.textContent = file.name;
-    li.onclick = () => playIndex(index);
-    ul.appendChild(li);
-  });
-}
-
-// ▶️ เล่นเพลง
-async function playIndex(index) {
-  currentIndex = index;
-  const file = await files[index].getFile();
-  const url = URL.createObjectURL(file);
-
-  player.src = url;
-  player.play();
-
-  document.getElementById("nowPlaying").innerText = "🎶 " + file.name;
-
-  document.querySelectorAll("li").forEach((li,i)=>{
-    li.classList.toggle("active", i===index);
-  });
-}
-
-// ⏭️ เล่นต่ออัตโนมัติ
-player.addEventListener("ended", () => {
-  currentIndex++;
-  if (currentIndex >= files.length) currentIndex = 0;
-  playIndex(currentIndex);
-});
-</script>
+      // workaround browser block
+      document.body.addEventListener("click", () => {
+        sound.play();
+      });
+    });
+  </script>
 
 </body>
 </html>

@@ -1,121 +1,221 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>กำลังปรับปรุง</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>เครื่องเล่น MP3 - Ryu XP</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-      overflow: hidden;
-    }
+<style>
+body{
+  margin:0;
+  font-family:-apple-system, sans-serif;
+  background:#f3f4f6;
+  color:#111;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
 
-    .container {
-      background: rgba(0,0,0,0.4);
-      padding: 30px;
-      border-radius: 15px;
-      max-width: 500px;
-      animation: fadeIn 1.5s ease;
-    }
+/* main */
+.app{
+  width:520px;
+  padding:25px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.8);
+  backdrop-filter:blur(20px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
 
-    h1 {
-      font-size: 2.5rem;
-      animation: bounce 2s infinite;
-    }
+/* buttons */
+button{
+  padding:8px 14px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  background:#e5e7eb;
+  color:#111;
+  cursor:pointer;
+  transition:.2s;
+}
+button:hover{
+  background:#10B981;
+  color:white;
+}
 
-    .loader {
-      margin: 20px auto;
-      width: 60px;
-      height: 60px;
-      border: 6px solid rgba(255,255,255,0.3);
-      border-top: 6px solid #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+/* list */
+ul{
+  list-style:none;
+  padding:0;
+  max-height:200px;
+  overflow:auto;
+}
+li{
+  padding:8px;
+  margin:4px 0;
+  border-radius:8px;
+  background:#f9fafb;
+  cursor:pointer;
+}
+li:hover{background:#d1fae5;}
+li.active{
+  background:#10B981;
+  color:white;
+}
 
-    .updates {
-      text-align: left;
-      margin-top: 20px;
-      background: rgba(255,255,255,0.1);
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-    }
+/* popup */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+.box{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+</style>
 
-    .updates li {
-      margin: 5px 0;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0);}
-      50% { transform: translateY(-10px);}
-    }
-
-    .footer {
-      margin-top: 15px;
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
-  </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>🚧 กำลังปรับปรุง</h1>
-
-    <div class="loader"></div>
-
-    <p>เว็บไซต์กำลังอัปเดต<br>ขออภัยในความไม่สะดวก</p>
-
-    <!-- 🔔 รายการอัปเดต -->
-    <div class="updates">
-      <strong>📢 สิ่งที่กำลังปรับปรุง:</strong>
-      <ul>
-        <li>✨ ปรับปรุงหน้าตาเว็บไซต์ใหม่</li>
-      </ul>
-    </div>
-
-    <div class="footer">
-      จะกลับมาเร็ว ๆ นี้ 🙏
-    </div>
+<!-- start -->
+<div id="startPopup" class="popup" style="display:flex;">
+  <div class="box">
+    <h2>🎵 เครื่องเล่น MP3</h2>
+    <p>create by <b>Ryu XP</b></p>
+    <button id="startBtn">เริ่มใช้งาน</button>
   </div>
+</div>
 
-  <!-- 🔊 เสียง -->
-  <audio id="bgSound" autoplay>
-    <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
-  </audio>
+<!-- help -->
+<div id="helpPopup" class="popup">
+  <div class="box">
+    <h3>📖 วิธีใช้</h3>
+    <p>
+      1. เลือกโฟลเดอร์<br>
+      2. เลือกเพลง<br>
+      3. เล่นต่ออัตโนมัติ<br>
+      4. เพิ่มเพลง → กดรีเฟรช
+    </p>
+    <button id="closeHelpBtn">ปิด</button>
+  </div>
+</div>
 
-  <script>
-    // เล่นเสียงเมื่อโหลดหน้า (บาง browser ต้อง interaction ก่อน)
-    window.addEventListener("load", () => {
-      const sound = document.getElementById("bgSound");
-      sound.volume = 0.3;
+<div class="app">
+  <h2>🎧 เครื่องเล่น MP3</h2>
 
-      // workaround browser block
-      document.body.addEventListener("click", () => {
-        sound.play();
-      });
-    });
-  </script>
+  <button id="pickBtn">📁 เลือกโฟลเดอร์</button>
+  <button id="refreshBtn">🔄 รีเฟรช</button>
+  <button id="helpBtn">❓ วิธีใช้</button>
+
+  <a href="https://ryuxp.vercel.app" target="_blank">
+    <button>⚠️ แจ้งปัญหา</button>
+  </a>
+
+  <p id="folder">ยังไม่ได้เลือกโฟลเดอร์</p>
+
+  <audio id="player" controls></audio>
+  <p id="now">ยังไม่ได้เล่น</p>
+
+  <ul id="list"></ul>
+</div>
+
+<script>
+let dir = null;
+let files = [];
+let index = 0;
+
+const player = document.getElementById("player");
+
+/* popup */
+document.getElementById("startBtn").onclick = () => {
+  document.getElementById("startPopup").style.display = "none";
+};
+
+document.getElementById("helpBtn").onclick = () => {
+  document.getElementById("helpPopup").style.display = "flex";
+};
+
+document.getElementById("closeHelpBtn").onclick = () => {
+  document.getElementById("helpPopup").style.display = "none";
+};
+
+/* folder */
+document.getElementById("pickBtn").onclick = async () => {
+  try{
+    dir = await window.showDirectoryPicker();
+    loadFiles();
+  }catch(e){}
+};
+
+document.getElementById("refreshBtn").onclick = () => {
+  if(!dir){
+    alert("เลือกโฟลเดอร์ก่อน");
+    return;
+  }
+  loadFiles();
+};
+
+/* load */
+async function loadFiles(){
+  files = [];
+
+  for await (const entry of dir.values()){
+    if(entry.kind === "file" && entry.name.toLowerCase().endsWith(".mp3")){
+      files.push(entry);
+    }
+  }
+
+  files.sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById("folder").innerText = "📁 " + dir.name;
+  renderList();
+}
+
+/* render */
+function renderList(){
+  const ul = document.getElementById("list");
+  ul.innerHTML = "";
+
+  files.forEach((f,i)=>{
+    const li = document.createElement("li");
+    li.textContent = f.name;
+    li.onclick = () => play(i);
+    ul.appendChild(li);
+  });
+}
+
+/* play */
+async function play(i){
+  index = i;
+
+  const file = await files[i].getFile();
+  const url = URL.createObjectURL(file);
+
+  player.src = url;
+  await player.play().catch(()=>{});
+
+  document.getElementById("now").innerText = "🎶 " + file.name;
+
+  document.querySelectorAll("li").forEach((li,j)=>{
+    li.classList.toggle("active", j === i);
+  });
+}
+
+/* auto next */
+player.addEventListener("ended", ()=>{
+  if(files.length === 0) return;
+
+  index++;
+  if(index >= files.length) index = 0;
+
+  play(index);
+});
+</script>
 
 </body>
 </html>

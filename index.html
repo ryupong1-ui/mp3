@@ -1,146 +1,251 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-  <meta charset="UTF-8">
-  <title>กำลังปรับปรุง</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Music Player</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-      overflow: hidden;
-    }
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:#f5f5f5;
+  color:#111;
+}
 
-    .container {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 30px;
-      border-radius: 15px;
-      max-width: 500px;
-      animation: fadeIn 1.5s ease;
-    }
+/* 🔐 LOGIN */
+#loginPage{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:#f5f5f5;
+}
 
-    h1 {
-      font-size: 2.5rem;
-      animation: bounce 2s infinite;
-    }
+.login-box{
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  width:300px;
+  text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+}
 
-    .loader {
-      margin: 20px auto;
-      width: 60px;
-      height: 60px;
-      border: 6px solid rgba(255, 255, 255, 0.3);
-      border-top: 6px solid #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+.input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:1px solid #ddd;
+  border-radius:8px;
+  background:#fafafa;
+}
 
-    .updates {
-      text-align: left;
-      margin-top: 20px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-    }
+.login-btn{
+  width:100%;
+  padding:10px;
+  background:#4285f4;
+  border:none;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
+}
 
-    .updates li {
-      margin: 5px 0;
-    }
+/* 🎵 APP */
+#app{
+  display:none;
+}
 
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
+header{
+  padding:15px;
+  background:#ffffff;
+  display:flex;
+  gap:10px;
+  border-bottom:1px solid #ddd;
+}
 
-      100% {
-        transform: rotate(360deg);
-      }
-    }
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#eee;
+}
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
+button:hover{
+  background:#ddd;
+}
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+#list{
+  list-style:none;
+  padding:10px;
+}
 
-    @keyframes bounce {
+li{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  cursor:pointer;
+}
 
-      0%,
-      100% {
-        transform: translateY(0);
-      }
+li:hover{
+  background:#eee;
+}
 
-      50% {
-        transform: translateY(-10px);
-      }
-    }
+li.active{
+  background:#dbeafe;
+}
 
-    .footer {
-      margin-top: 15px;
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
-  </style>
+/* 🎧 PLAYER */
+#playerBox{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#ffffff;
+  padding:10px;
+  border-top:1px solid #ddd;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
-    <h1>🚧 กำลังปรับปรุง</h1>
-
-    <div class="loader"></div>
-
-    <p>เว็บไซต์กำลังอัปเดต<br>ขออภัยในความไม่สะดวก</p>
-
-    <!-- 🔔 รายการอัปเดต -->
-    <div class="updates">
-      <strong>📢 สิ่งที่กำลังปรับปรุง:</strong>
-      <ul>
-        <li>✨ ปรับปรุงหน้าตาเว็บไซต์ใหม่</li>
-        <li>แก้บัคต่างๆ</li>
-        <li>เพิ่มระบบ login</li>
-        <li>มีความเสธียรขึ้น</li>
-      </ul>
-    </div>
-
-    <div class="footer">
-      จะกลับมาเร็ว ๆ นี้ 🙏
-    </div>
+<!-- 🔐 LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <h2>Sign in</h2>
+    <input id="username" class="input" placeholder="Username">
+    <input id="password" type="password" class="input" placeholder="Password">
+    <button class="login-btn" id="loginBtn">Login</button>
+    <p id="error" style="color:red;"></p>
   </div>
+</div>
 
-  <!-- 🔊 เสียง -->
-  <audio id="bgSound" autoplay>
-    <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
-  </audio>
+<!-- 🎵 APP -->
+<div id="app">
 
-  <script>
-    // เล่นเสียงเมื่อโหลดหน้า (บาง browser ต้อง interaction ก่อน)
-    window.addEventListener("load", () => {
-      const sound = document.getElementById("bgSound");
-      sound.volume = 0.3;
+<header>
+  <button id="pickBtn">📁 เลือกโฟลเดอร์</button>
+  <button id="refreshBtn">🔄 รีเฟรช</button>
+  <button id="logoutBtn">🚪 Logout</button>
+  <span id="folder">ยังไม่ได้เลือก</span>
+</header>
 
-      // workaround browser block
-      document.body.addEventListener("click", () => {
-        sound.play();
-      });
-    });
-  </script>
+<ul id="list"></ul>
+
+<div id="playerBox">
+  <div id="now">ยังไม่ได้เล่น</div>
+  <audio id="player" controls></audio>
+</div>
+
+</div>
+
+<script>
+let dir = null;
+let files = [];
+let index = 0;
+
+const player = document.getElementById("player");
+
+/* 🔐 USERS */
+const USERS = [
+  { username: "Ryu XP", password: "246810" },
+  { username: "แก้วตา", password: "999999" }
+];
+
+let isLoggedIn = false;
+
+/* 🔐 LOGIN */
+document.getElementById("loginBtn").onclick = () => {
+  const u = document.getElementById("username").value;
+  const p = document.getElementById("password").value;
+
+  const user = USERS.find(x => x.username === u && x.password === p);
+
+  if(user){
+    isLoggedIn = true;
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  }else{
+    document.getElementById("error").innerText = "❌ ข้อมูลไม่ถูกต้อง";
+  }
+};
+
+/* 🔓 LOGOUT */
+document.getElementById("logoutBtn").onclick = () => {
+  isLoggedIn = false;
+  document.getElementById("app").style.display = "none";
+  document.getElementById("loginPage").style.display = "flex";
+};
+
+/* 📁 PICK */
+document.getElementById("pickBtn").onclick = async () => {
+  if(!isLoggedIn) return alert("login ก่อน");
+
+  try{
+    dir = await window.showDirectoryPicker();
+    loadFiles();
+  }catch(e){}
+};
+
+/* 🔄 REFRESH */
+document.getElementById("refreshBtn").onclick = () => {
+  if(!dir) return alert("เลือกโฟลเดอร์ก่อน");
+  loadFiles();
+};
+
+/* 📂 LOAD */
+async function loadFiles(){
+  files = [];
+
+  for await (const entry of dir.values()){
+    if(entry.kind === "file" && entry.name.toLowerCase().endsWith(".mp3")){
+      files.push(entry);
+    }
+  }
+
+  files.sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById("folder").innerText = "📁 " + dir.name;
+  renderList();
+}
+
+/* 📃 LIST */
+function renderList(){
+  const ul = document.getElementById("list");
+  ul.innerHTML = "";
+
+  files.forEach((f,i)=>{
+    const li = document.createElement("li");
+    li.textContent = f.name;
+    li.onclick = () => play(i);
+    ul.appendChild(li);
+  });
+}
+
+/* ▶️ PLAY */
+async function play(i){
+  index = i;
+
+  const file = await files[i].getFile();
+  const url = URL.createObjectURL(file);
+
+  player.src = url;
+  await player.play().catch(()=>{});
+
+  document.getElementById("now").innerText = "🎶 " + file.name;
+
+  document.querySelectorAll("li").forEach((li,j)=>{
+    li.classList.toggle("active", j === i);
+  });
+}
+
+/* ⏭ AUTO NEXT */
+player.addEventListener("ended", ()=>{
+  if(files.length === 0) return;
+
+  index++;
+  if(index >= files.length) index = 0;
+
+  play(index);
+});
+</script>
 
 </body>
-
 </html>
